@@ -1,0 +1,194 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Квадрат — шахматы</title>
+<style>
+:root{--bg:#f4f3ef;--fg:#1d1d1f;--card:#fff;--mut:#8a8a85;--lt:#ebecd0;--dk:#739552;--ac:#2f6f4f;--acf:#fff;--sel:rgba(255,214,0,.55)}
+@media(prefers-color-scheme:dark){body:not(.gta):not(.cl):not(.re){--bg:#141514;--fg:#eee;--card:#222423;--mut:#8d8f8b;--lt:#d9d9c3;--dk:#5f7f45}}
+body.gta{--bg:linear-gradient(160deg,#ff5fa2,#ff9a4d 45%,#6a2cff);--fg:#fff;--card:rgba(25,0,50,.6);--mut:#ffd6ec;--lt:#ffd6ec;--dk:#c2186b;--ac:#00e5ff;--acf:#150028;--sel:rgba(0,229,255,.6)}
+body.cl{--bg:#e6e6e6;--fg:#1d1d1f;--card:#fff;--mut:#777;--lt:#f2f2f2;--dk:#4a4a4a;--ac:#222;--acf:#fff}
+body.cl .p.b{fill:#161616;stroke:#2f80ff;stroke-width:1.8}body.cl .c.b{background:#161616;box-shadow:0 0 0 2.5px #2f80ff,0 2px 5px rgba(0,0,0,.4)}
+body.re{--bg:#2b1d14;--fg:#f3e6d3;--card:#3b291c;--mut:#c9b49a;--lt:#f0d9b5;--dk:#b58863;--ac:#c58a4a;--acf:#1b1008}
+body.re #bd{box-shadow:0 0 0 7px #5a3a22,0 12px 34px rgba(0,0,0,.55)}
+body.re .p.w{fill:#f8f1e1;stroke:#4a3826}body.re .p.b{fill:#3b2f28;stroke:#150e09}body.re .c.w{background:#f8f1e1}body.re .c.b{background:#3b2f28}
+.p.w .e{fill:#2b2b2b;stroke:none}.p.b .e{fill:#fff;stroke:none}
+.seg.w4{flex-wrap:wrap}.seg.w4 button{flex:1 1 45%}
+#bd{transition:transform .6s cubic-bezier(.6,0,.3,1)}.q>*{transition:transform .6s cubic-bezier(.6,0,.3,1)}
+#bd.rot{transform:rotate(180deg)}#bd.rot .q>*{transform:rotate(-180deg);transition:transform .6s cubic-bezier(.6,0,.3,1)!important}
+#bd.nt,#bd.nt .q>*{transition:none!important}
+.cs{width:min(100%,520px,calc(100dvh - 230px));min-height:24px;display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--mut);gap:6px}
+.cap{display:flex;align-items:center;min-height:22px}svg.p.mn{width:22px;height:22px;margin-right:-7px;filter:none}
+.dot{display:inline-block;width:15px;height:15px;border-radius:50%;margin-right:-3px}.dot.w{background:#fff;box-shadow:0 0 0 1px #888}.dot.b{background:#2a2a2a}
+.boom{position:absolute;left:-100%;top:-100%;width:300%;height:300%;border-radius:50%;background:radial-gradient(circle,#fff 0,#ffe27a 18%,#ff8a00 42%,rgba(255,40,0,.55) 58%,rgba(255,0,0,0) 70%);z-index:7;pointer-events:none;animation:bm .6s ease-out forwards}
+@keyframes bm{0%{transform:scale(.15);opacity:1}60%{opacity:.95}100%{transform:scale(1.05);opacity:0}}
+#bd.shake{animation:sk .4s}@keyframes sk{0%,100%{transform:none}20%{transform:translate(-4px,3px)}40%{transform:translate(4px,-3px)}60%{transform:translate(-3px,-2px)}80%{transform:translate(3px,2px)}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{background:var(--bg);background-attachment:fixed;color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;flex-direction:column;align-items:center;gap:10px;padding:max(10px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom));overflow:hidden;touch-action:manipulation}
+header{width:min(100%,520px);display:flex;align-items:center;justify-content:space-between}
+header b{font-size:19px;letter-spacing:-.3px}body.gta header b{font-style:italic;letter-spacing:2px;text-shadow:0 0 12px #ff2d95,2px 2px 0 #6a2cff}
+button{font:inherit;color:var(--fg);border:0;cursor:pointer}
+.ib{width:44px;height:44px;border-radius:14px;background:var(--card);font-size:20px;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+#st{font-weight:600;font-size:15px;min-height:22px;text-align:center}
+#bd{width:min(100%,520px,calc(100dvh - 230px));aspect-ratio:1;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));grid-template-rows:repeat(8,minmax(0,1fr));flex:none;border-radius:12px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,.25);touch-action:none;position:relative}
+.q{min-width:0;min-height:0;position:relative;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;-webkit-user-select:none}
+.q.l{background:var(--lt)}.q.d{background:var(--dk)}.q.m{box-shadow:inset 0 0 0 100px rgba(255,225,0,.3)}.q.k{box-shadow:inset 0 0 0 100px rgba(235,40,40,.55)}#ar{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:6}.q.t.bad::after{background:rgba(225,30,30,.7)}.q.t.x.bad::after{background:none;border-color:rgba(225,30,30,.75)}.q.s{box-shadow:inset 0 0 0 100px var(--sel)}
+.q.t::after{content:"";position:absolute;width:26%;height:26%;border-radius:50%;background:rgba(0,0,0,.22);pointer-events:none}
+.q.t.x::after{width:88%;height:88%;background:none;border:4px solid rgba(0,0,0,.28)}
+.q>*{pointer-events:none}
+svg.p{width:78%;height:78%;stroke-width:1.3;stroke-linejoin:round;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.35))}
+.p.w{fill:#fff;stroke:#2b2b2b}.p.b{fill:#2a2a2a;stroke:#111}
+body.gta .p.w{stroke:#6a2cff}body.gta .p.b{fill:#2a0a4a;stroke:#00e5ff}
+.c{width:72%;height:72%;border-radius:50%;box-shadow:0 2px 5px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center}
+.c.w{background:#fff}.c.b{background:#2a2a2a}.c i{width:46%;height:46%;border-radius:50%;border:3px solid;opacity:.55}.c.w i{border-color:#2b2b2b}.c.b i{border-color:#fff}
+body.gta .c.b{background:#2a0a4a}
+.ov{position:fixed;inset:0;display:none;z-index:5;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:flex-end;justify-content:center}
+.ov.o{display:flex}
+.sheet{width:min(100%,480px);max-height:94dvh;overflow:auto;background:var(--card);border-radius:24px 24px 0 0;padding:22px 18px max(20px,env(safe-area-inset-bottom));backdrop-filter:blur(14px)}
+@media(min-width:600px){.ov{align-items:center}.sheet{border-radius:24px}}
+.sheet h2{margin:0 0 2px;font-size:26px;letter-spacing:-.5px}body.gta .sheet h2{font-style:italic;text-shadow:0 0 12px #ff2d95}
+.sub{color:var(--mut);font-size:14px;margin-bottom:14px}
+.sec{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--mut);margin:16px 0 8px}
+.card{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:12px 14px;border-radius:16px;background:rgba(128,128,128,.12);margin-bottom:8px;border:2px solid transparent}
+.card.on{border-color:var(--ac);background:rgba(128,128,128,.2)}
+.card .ic{width:42px;height:42px;border-radius:12px;background:var(--ac);color:var(--acf);display:flex;align-items:center;justify-content:center;font-size:22px;flex:none}
+.card b{display:block;font-size:16px}.card span{font-size:13px;color:var(--mut)}
+.seg{display:flex;background:rgba(128,128,128,.16);border-radius:12px;padding:3px}
+.seg button{flex:1;padding:10px;border-radius:10px;background:none;font-size:14px}.seg button.on{background:var(--ac);color:var(--acf);font-weight:600}
+.go{width:100%;margin-top:18px;padding:15px;border-radius:16px;background:var(--ac);color:var(--acf);font-size:17px;font-weight:700}
+.lk{width:100%;margin-top:8px;padding:12px;background:none;color:var(--mut);font-size:14px}
+#md{z-index:9}#mp{line-height:1.55;min-height:110px;margin:6px 0 12px}
+.nav{display:flex;gap:8px}.nav button{flex:1;padding:12px;border-radius:12px;background:rgba(128,128,128,.18)}
+</style></head><body>
+<header><button class="ib" onclick="M(1)">☰</button><b id="ttl">Квадрат</b><div style="display:flex;gap:6px"><button class="ib" id="un" onclick="undo()" style="display:none">↶</button><button class="ib" onclick="init()">↻</button></div></header>
+<div id="st"></div><div class="cs" id="ct"></div><div id="bd"></div><div class="cs" id="cb"></div>
+<div class="ov o" id="mn"><div class="sheet"><h2>Квадрат</h2><div class="sub">Минималистичные шахматы</div>
+<div class="sec">Режим</div><div id="cards"></div>
+<div class="sec">Соперник</div><div class="seg" id="sgo"></div>
+<div id="dif"><div class="sec">Сложность бота</div><div class="seg" id="sgd"></div></div>
+<div class="sec">Оформление</div><div class="seg" id="sgt"></div>
+<div class="sec">Звук</div><div class="seg" id="sgs"></div><div class="sec">Музыка</div><div class="seg" id="sgm"></div>
+<button class="go" onclick="init();M(0)">Играть</button><button class="lk" onclick="T(0)">Как играть · обучение</button></div></div>
+<div class="ov" id="pr" style="align-items:center"><div class="sheet" style="border-radius:24px;margin:16px"><h2 style="font-size:18px">Превратить пешку в…</h2><div id="pc" style="display:flex;gap:8px;margin-top:12px"></div></div></div>
+<div class="ov" id="en" style="align-items:center"><div class="sheet" style="border-radius:24px;margin:16px;text-align:center"><h2 id="et" style="font-size:34px"></h2><p id="ep" class="sub"></p><button class="go" onclick="init()">Реванш</button><button class="lk" onclick="$('#en').classList.remove('o');M(1)">В меню</button><button class="lk" onclick="$('#en').classList.remove('o')">Посмотреть доску</button></div></div>
+<div class="ov" id="md"><div class="sheet"><h2 id="mt" style="font-size:19px"></h2><p id="mp"></p><div class="nav"><button onclick="T(-1)">←</button><button onclick="T(1)">→</button><button onclick="md.classList.remove('o')">Закрыть</button></div></div></div>
+<script>
+const $=s=>document.querySelector(s),md=$('#md'),MN={chess:['♘','Шахматы','Классические правила'],checkers:['◉','Шашки','Бить обязательно, дамки'],atomic:['✸','Атомные шахматы','Взятие взрывает соседние фигуры']};
+const SV={P:'<circle cx="20" cy="11.5" r="4.6"/><path d="M15.5 17.5h9l-1 3c3.2 1.8 4.7 5.6 4.7 10.5H11.8c0-4.9 1.5-8.7 4.7-10.5z"/><rect x="10.5" y="31" width="19" height="4.5" rx="2"/>',
+R:'<rect x="10" y="31.5" width="20" height="4" rx="1.5"/><path d="M13 31.5l1.3-12h11.4l1.3 12z"/><path d="M12 19.5v-9h4v3h2.5v-3h3v3H24v-3h4v9z"/>',
+B:'<circle cx="20" cy="6.8" r="2.4"/><path d="M20 9.5c6.5 4.5 7.5 10 5 14.5-.8 1.4-.6 3 .8 4.5H14.2c1.4-1.5 1.6-3.1.8-4.5-2.5-4.5-1.5-10 5-14.5z"/><path d="M20 14v6M17 17h6" fill="none"/><rect x="10.5" y="28.5" width="19" height="3" rx="1.5"/><rect x="12" y="32" width="16" height="3.5" rx="1.75"/>',
+N:'<path d="M11.5 35.5c0-6.5 1-10 4.8-13.8-1.2-1-2.2-2.4-3.2-4l1-2.6 3.4-4-.3-3.4 3 2.4c6.6 1 10.6 6.6 10.6 14.4 0 3.2-.2 6.2-.2 11z"/><circle class="e" cx="19.3" cy="15.4" r="1.2"/>',
+Q:'<circle cx="10.5" cy="11.5" r="2.2"/><circle cx="15.5" cy="8.5" r="2.2"/><circle cx="20" cy="7" r="2.2"/><circle cx="24.5" cy="8.5" r="2.2"/><circle cx="29.5" cy="11.5" r="2.2"/><path d="M10.5 14L14.5 24 15.5 11 20 23 24.5 11 25.5 24 29.5 14 28 31H12z"/><rect x="10.5" y="31" width="19" height="4.5" rx="2"/>',
+K:'<path d="M18.6 3h2.8v3h3v2.8h-3v3h-2.8v-3h-3V6h3z"/><path d="M20 12.5c4 0 6 2 6 4.5 0 1.5-1 2.8-2 3.6 3.6 2.2 5 5.8 5 10.4H11c0-4.6 1.4-8.2 5-10.4-1-.8-2-2.1-2-3.6 0-2.5 2-4.5 6-4.5z"/><rect x="10.5" y="31" width="19" height="4.5" rx="2"/>'},V={P:1,N:3,B:3,R:5,Q:9,K:100};
+let mode='chess',b,turn,sel,mv,chain,over,bot=true,last,lastF,FR,lvl=2,th='',hm=0,free=false,hist=[],bmF=0,fl=false,lock=0,msg='',mvd={},pend,ar=[],pv=null,as=null,tm,noClick=false;
+const in8=(r,c)=>r>=0&&r<8&&c>=0&&c<8,opp=t=>t=='w'?'b':'w';
+function init(){sel=null;mv=[];chain=null;over=null;turn='w';last=lastF=FR=null;hm=0;hist=[];bmF=0;fl=false;lock=0;msg='';mvd={};ar=[];pv=null;$('#en').classList.remove('o');
+if(mode=='checkers')b=Array.from({length:8},(_,r)=>Array.from({length:8},(_,c)=>(r+c)%2?(r<3?'b':r>4?'w':''):''));
+else{const k=[...'RNBQKBNR'];b=[k.map(x=>'b'+x),Array(8).fill('bP'),...Array.from({length:4},()=>Array(8).fill('')),Array(8).fill('wP'),k.map(x=>'w'+x)]}
+draw()}
+function ps(b,r,c,att){const p=b[r][c],o=p[0],t=p[1],res=[];
+const add=(y,x)=>{if(!in8(y,x))return false;const q=b[y][x];if(q&&q[0]==o)return false;res.push({r:y,c:x});return !q};
+if(t=='P'){const d=o=='w'?-1:1;[-1,1].forEach(s=>{const y=r+d,x=c+s;if(in8(y,x)&&(att||(b[y][x]&&b[y][x][0]!=o)))res.push({r:y,c:x})});
+if(!att&&in8(r+d,c)&&!b[r+d][c]){res.push({r:r+d,c});if(r==(o=='w'?6:1)&&!b[r+2*d][c])res.push({r:r+2*d,c})}}
+else if(t=='N')[[1,2],[2,1],[-1,2],[-2,1],[1,-2],[2,-1],[-1,-2],[-2,-1]].forEach(([a,e])=>add(r+a,c+e));
+else{const D=[];if(t!='B')D.push([1,0],[-1,0],[0,1],[0,-1]);if(t!='R')D.push([1,1],[1,-1],[-1,1],[-1,-1]);
+D.forEach(([a,e])=>{let y=r+a,x=c+e;if(t=='K'){add(y,x);return}while(add(y,x)){y+=a;x+=e}})}
+return res}
+function ap(b,f,m){const n=b.map(r=>[...r]),p=n[f.r][f.c],cap=n[m.r][m.c];n[f.r][f.c]='';n[m.r][m.c]=p;if(m.cs){if(m.c==6){n[f.r][5]=n[f.r][7];n[f.r][7]=''}else{n[f.r][3]=n[f.r][0];n[f.r][0]=''}}
+if(p[1]=='P'&&m.r==(p[0]=='w'?0:7))n[m.r][m.c]=p[0]+(m.pr||'Q');
+if(mode=='atomic'&&cap){for(let y=m.r-1;y<=m.r+1;y++)for(let x=m.c-1;x<=m.c+1;x++)if(in8(y,x)&&(y==m.r&&x==m.c||(n[y][x]&&n[y][x][1]!='P')))n[y][x]=''}
+return n}
+function kp(b,o){for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(b[r][c]==o+'K')return{r,c};return null}
+function att(b,r,c,by){for(let y=0;y<8;y++)for(let x=0;x<8;x++)if(b[y][x]&&b[y][x][0]==by&&ps(b,y,x,1).some(m=>m.r==r&&m.c==c))return true;return false}
+function chk(b,o){const k=kp(b,o);return k&&att(b,k.r,k.c,opp(o))}
+function cm(b,r,c,capOnly){const p=b[r][c],o=p.toLowerCase(),K=p!=o,d=o=='w'?-1:1,res=[];
+[[1,1],[1,-1],[-1,1],[-1,-1]].forEach(([a,e])=>{const y=r+a,x=c+e;if(!in8(y,x))return;
+if(!b[y][x]){if(!capOnly&&(K||a==d))res.push({r:y,c:x})}
+else if(b[y][x].toLowerCase()!=o&&in8(y+a,x+e)&&!b[y+a][x+e])res.push({r:y+a,c:x+e,cr:y,cc:x})});return res}
+function gm(r,c){const p=b[r][c];if(!p||p[0].toLowerCase()!=turn)return[];
+if(mode=='checkers'){if(chain)return(chain.r==r&&chain.c==c)?cm(b,r,c,1):[];
+let any=false;for(let y=0;y<8;y++)for(let x=0;x<8;x++)if(b[y][x]&&b[y][x].toLowerCase()==turn&&cm(b,y,x,1).length)any=true;return cm(b,r,c,any)}
+const L=ps(b,r,c).filter(m=>mode=='atomic'||!chk(ap(b,{r,c},m),turn));
+if(p[1]=='K'&&c==4&&r==(turn=='w'?7:0)&&!mvd[r+',4']&&(mode=='atomic'||!att(b,r,4,opp(turn))))[[7,6,[5,6]],[0,2,[1,2,3]]].forEach(([rc,dc,E])=>{if(b[r][rc]==turn+'R'&&!mvd[r+','+rc]&&E.every(x=>!b[r][x])&&(mode=='atomic'||[rc==7?5:3,dc].every(x=>!att(b,r,x,opp(turn)))))L.push({r,c:dc,cs:1})});
+return L}
+function gb(r,c){return mode=='chess'?ps(b,r,c).filter(m=>chk(ap(b,{r,c},m),turn)):[]}
+function all(){const l=[];for(let r=0;r<8;r++)for(let c=0;c<8;c++)gm(r,c).forEach(m=>l.push({f:{r,c},m}));return l}
+function play(f,m){hist.push({b:b.map(r=>[...r]),turn,last,lastF,mvd:{...mvd},hm,over,chain});const cp=m.cr!=null||(mode!='checkers'&&!!b[m.r][m.c]),pc=b[f.r][f.c];hm=cp||(mode=='checkers'?pc==pc.toLowerCase():pc[1]=='P')?0:hm+1;if(mode=='atomic'&&cp){boomSnd();bmF=1}else sound(cp);const mover=turn;FR=cel(f.r,f.c).getBoundingClientRect();mvd[f.r+','+f.c]=mvd[m.r+','+m.c]=1;last=m;lastF=f;
+if(mode=='checkers'){let p=b[f.r][f.c];b[f.r][f.c]='';if(m.cr!=null)b[m.cr][m.cc]='';
+const prom=p==p.toLowerCase()&&m.r==(p=='w'?0:7);if(prom)p=p.toUpperCase();b[m.r][m.c]=p;
+if(m.cr!=null&&!prom&&cm(b,m.r,m.c,1).length){chain={r:m.r,c:m.c};sel=chain;mv=gm(m.r,m.c);return after()}
+chain=null}else b=ap(b,f,m);
+turn=opp(turn);sel=null;mv=[];
+if(mode=='atomic'){if(!kp(b,mover))over=(mover=='w'?'Чёрные':'Белые')+' победили — король взорван!';else if(!kp(b,opp(mover)))over=(mover=='w'?'Белые':'Чёрные')+' победили — король взорван!'}
+if(!over&&mode=='chess'){const q=b.flat().filter(p=>p&&p[1]!='K');if(!q.length||q.length==1&&'BN'.includes(q[0][1]))over='Ничья — недостаточно фигур'}
+if(!over&&!all().length)over=mode=='checkers'||chk(b,turn)?(mover=='w'?'Белые':'Чёрные')+' победили!':'Пат — ничья';if(!over&&!free&&hm>=100)over='Ничья — 50 ходов без взятий и ходов пешками';
+after()}
+function after(){draw();fly();boom();if(over)setTimeout(endScr,900);else if(bot&&turn=='b')setTimeout(botMove,700);else if(!bot&&!free&&fl!=(turn=='b')){lock=1;setTimeout(()=>{fl=turn=='b';lock=0;draw()},450)}}
+let AC,snOn=true;let muOn=true,mu,muT;
+function lost(o){const I={P:8,N:2,B:2,R:2,Q:1},c={};b.forEach(r=>r.forEach(p=>{if(p&&p[0]==o)c[p[1]]=(c[p[1]]||0)+1}));const a=[];for(const t of 'QRBNP')for(let k=I[t]-(c[t]||0);k>0;k--)a.push(t);return a}
+function cpt(o){if(mode=='checkers'){let n=12;b.forEach(r=>r.forEach(p=>{if(p&&p.toLowerCase()==o)n--}));return `<i class="dot ${o}"></i>`.repeat(Math.max(0,n))}return lost(o).map(t=>`<svg class="p ${o} mn" viewBox="0 0 40 40">${SV[t]}</svg>`).join('')}
+function undo(){const h=hist.pop();if(!h)return;({turn,last,lastF,hm,over,chain}=h);b=h.b;mvd=h.mvd;sel=null;mv=[];FR=null;ar=[];$('#en').classList.remove('o');draw()}
+function setOp(v){bot=v=='b';free=v=='f';rm()}
+function boom(){if(!bmF)return;bmF=0;const q=cel(last.r,last.c),B=$('#bd');q.insertAdjacentHTML('beforeend','<div class="boom"></div>');B.classList.add('shake');setTimeout(()=>{B.classList.remove('shake');const e=q.querySelector('.boom');e&&e.remove()},650)}
+function boomSnd(){if(!snOn)return;const a=ac();if(!a)return;const t=a.currentTime,n=a.createBuffer(1,a.sampleRate*.7|0,a.sampleRate),d=n.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);const s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();f.type='lowpass';f.frequency.setValueAtTime(1800,t);f.frequency.exponentialRampToValueAtTime(120,t+.6);g.gain.value=.9;s.buffer=n;s.connect(f);f.connect(g);g.connect(a.destination);s.start(t);const o=a.createOscillator(),h=a.createGain();o.frequency.setValueAtTime(110,t);o.frequency.exponentialRampToValueAtTime(35,t+.4);h.gain.setValueAtTime(.7,t);h.gain.exponentialRampToValueAtTime(.001,t+.5);o.connect(h);h.connect(a.destination);o.start(t);o.stop(t+.55)}
+function note(f,t,d,v){if(!mu)return;const a=AC,o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+d*.35);g.gain.linearRampToValueAtTime(0,t+d);o.connect(g);g.connect(mu);o.start(t);o.stop(t+d+.1)}
+function startMu(){if(!muOn||mu)return;const a=ac();if(!a)return;mu=a.createGain();mu.gain.setValueAtTime(0,a.currentTime);mu.gain.linearRampToValueAtTime(.2,a.currentTime+3);const f=a.createBiquadFilter();f.type='lowpass';f.frequency.value=1200;mu.connect(f);f.connect(a.destination);let i=0;const P=[[57,60,64,67],[53,57,60,64],[48,52,55,59],[55,59,62,64]],hz=n=>440*Math.pow(2,(n-69)/12),ch=()=>{const t=a.currentTime+.05,c=P[i++%4];c.forEach((n,k)=>note(hz(n-12),t+k*.2,8,.12));c.forEach((n,k)=>note(hz(n+12),t+1+k*1.4,4,.05))};ch();muT=setInterval(ch,6500)}
+function stopMu(){if(!mu)return;const m=mu,a=AC;mu=null;clearInterval(muT);m.gain.cancelScheduledValues(a.currentTime);m.gain.setValueAtTime(m.gain.value,a.currentTime);m.gain.linearRampToValueAtTime(0,a.currentTime+1);setTimeout(()=>m.disconnect(),1200)}
+function sth(){document.body.classList.remove('gta','cl','re');if(th)document.body.classList.add(th)}
+function ac(){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state=='suspended')AC.resume()}catch(e){}return AC}
+addEventListener('pointerdown',()=>{ac();startMu()});
+function sound(cap){if(!snOn)return;const a=ac();if(!a)return;const t=a.currentTime,o=a.createOscillator(),g=a.createGain();o.type='triangle';o.frequency.setValueAtTime(cap?180:260,t);o.frequency.exponentialRampToValueAtTime(70,t+.09);g.gain.setValueAtTime(cap?.5:.35,t);g.gain.exponentialRampToValueAtTime(.001,t+.12);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+.13);
+if(cap){const n=a.createBuffer(1,2205,44100),d=n.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(1-i/d.length);const s=a.createBufferSource(),h=a.createGain();h.gain.value=.3;s.buffer=n;s.connect(h);h.connect(a.destination);s.start(t)}}
+function fly(){if(!FR||!last)return;const q=cel(last.r,last.c),e=q.firstElementChild;if(!e)return;const d=q.getBoundingClientRect();e.style.transition='none';e.style.transform=`translate(${FR.left-d.left}px,${FR.top-d.top}px)`;q.style.zIndex=4;e.getBoundingClientRect();e.style.transition='transform .3s cubic-bezier(.3,.7,.2,1)';e.style.transform='';setTimeout(()=>q.style.zIndex='',330);FR=null}
+function sim(x){const n=b.map(r=>[...r]);let p=n[x.f.r][x.f.c];n[x.f.r][x.f.c]='';if(x.m.cr!=null)n[x.m.cr][x.m.cc]='';if(p=='b'&&x.m.r==7)p='B';n[x.m.r][x.m.c]=p;return n}
+function score(x){const r=Math.random();if(lvl==1)return r;const nb=mode=='checkers'?sim(x):ap(b,x.f,x.m);
+if(lvl==2)return r+(mode=='checkers'?(x.m.cr!=null?5:0):mat(nb,'b'));return r*.3+hard(x,nb)}
+function hard(x,nb){const B=b,T=turn,C=chain;b=nb;turn='w';chain=null;let s;
+if(mode=='checkers'){let cap=0,m=0;for(let y=0;y<8;y++)for(let c=0;c<8;c++){const p=b[y][c];if(!p)continue;m+={b:1,B:2.5,w:-1,W:-2.5}[p];if(p.toLowerCase()=='w'&&cm(b,y,c,1).length)cap=1}s=m-cap*1.5+(x.m.cr!=null?1:0)}
+else{const rp=all();s=rp.length?Math.min(...rp.map(q=>mat(ap(nb,q.f,q.m),'b'))):(chk(nb,'w')?1e3:0)}
+b=B;turn=T;chain=C;return s}
+function mat(n,o){let s=0;n.forEach(r=>r.forEach(p=>{if(p)s+=(p[0]==o?1:-1)*V[p[1]]}));return s}
+function botMove(){const l=all();if(!l.length)return;let best=null,bs=-1e9;
+l.forEach(x=>{let s=score(x);
+if(s>bs){bs=s;best=x}});play(best.f,best.m)}
+function cell(r,c){if(noClick){noClick=false;return}if(over||lock||(bot&&turn=='b'))return;ar=[];
+const m=mv.find(m=>m.r==r&&m.c==c);if(sel&&m)return go(sel,m);
+if(chain)return;const p=b[r][c];if(free&&p)turn=p[0].toLowerCase();if(p&&p[0].toLowerCase()==turn){sel={r,c};mv=gm(r,c)}else{if(sel&&mode=='chess'&&gb(sel.r,sel.c).some(x=>x.r==r&&x.c==c))msg='Так нельзя: ваш король окажется под шахом';else{sel=null;mv=[]}}draw()}
+function cel(r,c){return $('#bd').children[fl?(7-r)*8+7-c:r*8+c]}
+function draw(){let h='';const kk=mode=='chess'?(chk(b,turn)?kp(b,turn):null):null,bd=sel&&mode=='chess'&&!chain?gb(sel.r,sel.c):[];
+for(let i=0;i<8;i++)for(let j=0;j<8;j++){const r=fl?7-i:i,c=fl?7-j:j,p=b[r][c],t=mv.find(m=>m.r==r&&m.c==c),x=bd.find(m=>m.r==r&&m.c==c);
+const cls='q '+((r+c)%2?'d':'l')+(lastF&&(lastF.r==r&&lastF.c==c||last.r==r&&last.c==c)?' m':'')+(kk&&kk.r==r&&kk.c==c?' k':'')+(sel&&sel.r==r&&sel.c==c?' s':'')+(t||x?' t':'')+((t||x)&&p?' x':'')+(x&&!t?' bad':'');let ic='';
+if(p){if(mode=='checkers'){const o=p.toLowerCase();ic=`<div class="c ${o}">${p!=o?'<i></i>':''}</div>`}else ic=`<svg class="p ${p[0]}" viewBox="0 0 40 40">${SV[p[1]]}</svg>`}
+h+=`<div class="${cls}" data-r="${r}" data-c="${c}" onclick="cell(${r},${c})">${ic}</div>`}
+$('#bd').innerHTML=h+asvg();
+$('#st').textContent=over||msg||((turn=='w'?'Ход белых':bot?'Бот думает…':'Ход чёрных')+(kk?' · шах!':'')+(chain?' · бейте дальше':''));msg='';
+const tc=fl?'w':'b',bc=opp(tc);$('#ct').innerHTML=`<span class="cap">${cpt(bc)}</span><span>${free?'Свободная игра':'До ничьей: '+(50-(hm>>1))}</span>`;$('#cb').innerHTML=`<span class="cap">${cpt(tc)}</span>`;$('#un').style.display=free?'':'none';
+$('#ttl').textContent=MN[mode][1]}
+function asvg(){const L=[...ar,...(pv?[pv]:[])],P=(r,c)=>[(fl?7-c:c)+.5,(fl?7-r:r)+.5];
+return '<svg id="ar" viewBox="0 0 8 8"><defs><marker id="ah" markerWidth="4" markerHeight="4" refX="2.4" refY="2" orient="auto"><path d="M0 0L4 2L0 4z" fill="#f5a623"/></marker></defs>'+L.map(a=>{const[x1,y1]=P(a[0],a[1]),[x2,y2]=P(a[2],a[3]);return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#f5a623" stroke-opacity=".85" stroke-width=".16" stroke-linecap="round" marker-end="url(#ah)"/>`}).join('')+'</svg>'}
+function rar(){const a=$('#ar');if(a)a.outerHTML=asvg()}
+function go(f,m){const p=b[f.r][f.c];if(mode!='checkers'&&p[1]=='P'&&(m.r==0||m.r==7)){pend=[f,m];$('#pc').innerHTML=['Q','R','B','N'].map(t=>`<button class="card" style="flex:1;width:auto;justify-content:center;padding:6px;margin:0" onclick="pk('${t}')"><svg class="p ${turn}" viewBox="0 0 40 40" style="width:100%">${SV[t]}</svg></button>`).join('');$('#pr').classList.add('o');return}play(f,m)}
+function pk(t){$('#pr').classList.remove('o');play(pend[0],{...pend[1],pr:t})}
+function endScr(){if(!over||free)return;const w=over.startsWith('Белые')?'w':over.startsWith('Чёрные')?'b':'d';
+$('#et').textContent=w=='d'?'Ничья':bot?(w=='w'?'Победа!':'Поражение'):(w=='w'?'Белые победили':'Чёрные победили');$('#ep').textContent=over;$('#en').classList.add('o')}
+const cellAt=(x,y)=>{const e=document.elementFromPoint(x,y),q=e&&e.closest&&e.closest('.q');return q?[+q.dataset.r,+q.dataset.c]:null};
+const BD=$('#bd');BD.addEventListener('contextmenu',e=>e.preventDefault());
+BD.addEventListener('pointerdown',e=>{const q=cellAt(e.clientX,e.clientY);if(!q)return;clearTimeout(tm);if(e.button==2){as=q;return}tm=setTimeout(()=>{as=q;noClick=true;navigator.vibrate&&navigator.vibrate(15)},380)});
+BD.addEventListener('pointermove',e=>{if(!as)return;const q=cellAt(e.clientX,e.clientY);pv=q&&(q[0]!=as[0]||q[1]!=as[1])?[...as,...q]:null;rar()});
+addEventListener('pointerup',e=>{clearTimeout(tm);if(!as)return;const q=cellAt(e.clientX,e.clientY);if(q&&(q[0]!=as[0]||q[1]!=as[1])){const n=[...as,...q],k=n.join(),i=ar.findIndex(a=>a.join()==k);i<0?ar.push(n):ar.splice(i,1)}as=null;pv=null;noClick=true;rar();setTimeout(()=>noClick=false,60)});
+addEventListener('pointercancel',()=>{clearTimeout(tm);as=null;pv=null;rar()});
+function M(o){$('#mn').classList.toggle('o',!!o);if(o)rm()}
+function rm(){$('#cards').innerHTML=Object.keys(MN).map(k=>`<button class="card ${k==mode?'on':''}" onclick="mode='${k}';rm()"><div class="ic">${MN[k][0]}</div><div><b>${MN[k][1]}</b><span>${MN[k][2]}</span></div></button>`).join('');
+$('#sgo').innerHTML=[['b','Против бота'],['p','Два игрока'],['f','Свободная']].map(([v,n])=>`<button class="${(free?'f':bot?'b':'p')==v?'on':''}" onclick="setOp('${v}')">${n}</button>`).join('');
+$('#sgm').innerHTML=[[1,'Вкл'],[0,'Выкл']].map(([v,n])=>`<button class="${muOn==!!v?'on':''}" onclick="muOn=!!${v};muOn?startMu():stopMu();rm()">${n}</button>`).join('');
+$('#sgs').innerHTML=[[1,'Вкл'],[0,'Выкл']].map(([v,n])=>`<button class="${snOn==!!v?'on':''}" onclick="snOn=!!${v};rm();sound()">${n}</button>`).join('');
+$('#dif').style.display=bot?'':'none';$('#sgd').innerHTML=[[1,'Лёгкий'],[2,'Средний'],[3,'Сложный']].map(([v,n])=>`<button class="${lvl==v?'on':''}" onclick="lvl=${v};rm()">${n}</button>`).join('');
+$('#sgt').className='seg w4';$('#sgt').innerHTML=[['','Современный'],['cl','Классика'],['re','Реализм'],['gta','GTA VI']].map(([v,n])=>`<button class="${th==v?'on':''}" onclick="th='${v}';sth();rm()">${n}</button>`).join('')}
+const TU=[['Цель','В шахматах нужно поставить мат — атаковать короля соперника так, чтобы спастись было нельзя. Нажмите на фигуру: точки покажут ходы, а кольцо — возможное взятие. Белые ходят первыми.'],
+['♟ Пешка','Ходит вперёд на 1 клетку (с исходной позиции — на 2), бьёт по диагонали вперёд. Дойдя до конца доски, превращается в ферзя.'],
+['♞ ♜ ♝','Конь ходит буквой «Г» и перепрыгивает фигуры. Ладья — по прямым, слон — по диагоналям, на любое число клеток.'],
+['♛ ♚','Ферзь ходит как ладья и слон вместе. Король — на 1 клетку в любую сторону, но не под удар. Шах — угроза королю, нужно её убрать.'],
+['Итог партии','Мат — победа. Пат — у вас нет ходов, но шаха нет: ничья. Есть рокировка (король идёт на 2 клетки к ладье). Красные точки — ходы, после которых король окажется под шахом. Долгое нажатие и перетаскивание рисует стрелку. Взятия на проходе нет. Если 50 ходов подряд нет взятий и ходов пешками — ничья (счётчик над доской). Режим «Свободная игра» — один человек двигает обе стороны, есть кнопка отмены ↶.'],
+['Шашки','Ходят по тёмным клеткам по диагонали вперёд. Бить обязательно, можно назад и цепочкой. Дошедшая до края шашка становится дамкой (ходит в любую сторону на 1 клетку). Победа — у соперника нет ходов.'],
+['Атомные шахматы','Ходят как обычные, но каждое взятие — взрыв: исчезают бьющая фигура и все соседние фигуры (кроме пешек). Побеждает тот, кто взорвал вражеского короля. Шаха нет — король может стоять под боем.'],
+['Советы','Занимайте центр, развивайте коней и слонов, не теряйте фигуры даром. Против бота — простого, он считает материал. Оформление меняется в меню (☰).']];
+let ti=0;function T(d){if(d==0)ti=0;else ti=Math.max(0,Math.min(TU.length-1,ti+d));md.classList.add('o');$('#mt').textContent=`${ti+1}/${TU.length} · ${TU[ti][0]}`;$('#mp').textContent=TU[ti][1]}
+init();M(1);
+</script></body></html>
